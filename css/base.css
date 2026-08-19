@@ -1,0 +1,65 @@
+/* ========== 基础重置 ========== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Icons", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html {
+    height: 100%;
+    scroll-behavior: smooth;
+    color-scheme: dark;
+}
+html.light-mode {
+    color-scheme: light;
+}
+
+body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: var(--bg-gradient) fixed;
+    color: var(--text-main);
+    display: flex;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    /* 防止 iOS 橡皮筋把固定按钮带偏 */
+    overscroll-behavior-x: none;
+    overscroll-behavior-y: contain;
+    position: relative;
+}
+/* 无壁纸时：遮罩暗化压暗背景渐变（有壁纸时由 body.has-wallpaper 渐变承担） */
+body:not(.has-wallpaper)::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: rgba(0, 0, 0, var(--wallpaper-mask-opacity, 0.10));
+}
+button,
+a.card,
+.tab-item,
+.engine-btn,
+.settings-tab-btn {
+    touch-action: manipulation;
+}
+
+/* 减少动画时的重绘开销 */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-normal); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-sub); }
+

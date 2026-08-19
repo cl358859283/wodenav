@@ -1,0 +1,9 @@
+# 可选：用 Wrangler 本地预览或直接上传到 Cloudflare Pages
+# 安装: npm i -g wrangler
+# 本地: wrangler pages dev .
+# 上传: wrangler pages deploy . --project-name=wodenav
+
+name = "wodenav"
+compatibility_date = "2024-01-01"
+
+pages_build_output_dir = "."

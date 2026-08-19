@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="description" content="个人导航页 — 本地存储、可自定义分类与搜索引擎">
+    <meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
+    <meta name="color-scheme" content="dark light">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>个人导航</title>
+    <!-- 预连接外部资源 -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://favicon.im" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://favicon.im">
+    <!-- 样式：按职责拆分，便于维护 -->
+    <link rel="stylesheet" href="css/variables.css?v=20260816e">
+    <link rel="stylesheet" href="css/base.css?v=20260816e">
+    <link rel="stylesheet" href="css/layout.css?v=20260816e">
+    <link rel="stylesheet" href="css/components-cards.css?v=20260816e">
+    <link rel="stylesheet" href="css/components-settings.css?v=20260816e">
+    <link rel="stylesheet" href="css/components-sync.css?v=20260816e">
+    <link rel="stylesheet" href="css/components-manage.css?v=20260816e">
+    <link rel="stylesheet" href="css/responsive.css?v=20260816e">
+    <!-- 移动端触摸拖拽 Polyfill -->
+    <script src="https://cdn.jsdelivr.net/npm/drag-drop-touch@1.3.1/DragDropTouch.js" defer></script>
+</head>
+<body>
+    <button class="sidebar-float-btn" id="sidebarToggle" type="button" aria-label="切换侧边栏" aria-expanded="false">
+        <span class="sidebar-toggle-icon" aria-hidden="true">
+            <span class="sidebar-bar sidebar-bar1"></span>
+            <span class="sidebar-bar sidebar-bar2"></span>
+            <span class="sidebar-bar sidebar-bar3"></span>
+        </span>
+    </button>
+
+    <!-- 右下角圆形展开菜单（方案A） -->
+    <div class="fab-menu-wrap" id="fabMenu">
+        <button class="fab-toggle-btn" id="fabToggleBtn" type="button" aria-label="展开快捷菜单" aria-expanded="false"></button>
+        <!-- 设置 -->
+        <button class="fab-menu-item" id="fabSettingsBtn" type="button" title="设置与添加链接" aria-label="设置与添加链接">
+            <svg viewBox="0 0 24 24">
+                <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
+            </svg>
+        </button>
+        <!-- 换壁纸 -->
+        <button class="fab-menu-item" id="fabWallpaperBtn" type="button" title="切换壁纸" aria-label="切换壁纸">
+            <svg viewBox="0 0 24 24">
+                <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+            </svg>
+        </button>
+        <!-- 搜索聚焦 -->
+        <button class="fab-menu-item" id="fabSearchBtn" type="button" title="聚焦搜索" aria-label="聚焦搜索">
+            <svg viewBox="0 0 24 24">
+                <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+            </svg>
+        </button>
+    </div>
+    
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
+    <div class="sidebar collapsed" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-header-icon" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <path d="M3 7.5A2.5 2.5 0 0 1 5.5 5h3.1c.4 0 .8.16 1.1.44L11 6.8h7.5A2.5 2.5 0 0 1 21 9.3v8.2A2.5 2.5 0 0 1 18.5 20h-13A2.5 2.5 0 0 1 3 17.5v-10z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                    <path d="M3 10h18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="sidebar-header-title">分类导航</div>
+        </div>
+        <div class="sidebar-menu" id="sidebarMenu"></div>
+    </div>
+
+    <!-- 主页右上角明暗切换开关 -->
+    <label class="theme-switch" for="themeToggle" title="切换明暗主题">
+        <span class="theme-switch__toggle-wrap">
+            <input id="themeToggle" class="theme-switch__toggle" type="checkbox" role="switch" name="theme" aria-label="切换明暗主题">
+            <span class="theme-switch__icon">
+                <span class="theme-switch__icon-part"></span>
+                <span class="theme-switch__icon-part"></span>
+                <span class="theme-switch__icon-part"></span>
+                <span class="theme-switch__icon-part"></span>
+                <span class="theme-switch__icon-part"></span>
+                <span class="theme-switch__icon-part"></span>
+                <span class="theme-switch__icon-part"></span>
+                <span class="theme-switch__icon-part"></span>
+                <span class="theme-switch__icon-part"></span>
+            </span>
+        </span>
+    </label>
+    
+    <div class="page-wrap">
+        <header>
+            <div class="clock" id="clock" aria-live="polite" aria-atomic="true">
+                <span class="clock-h" id="clockH">00</span><span class="clock-colon" aria-hidden="true">:</span><span class="clock-m" id="clockM">00</span><span class="clock-sec" id="clockSec">00</span>
+            </div>
+            <div class="date-display" id="dateDisplay">
+                <span class="date-main" id="dateMain">加载中...</span>
+                <span class="date-weekday" id="dateWeekday"></span>
+            </div>
+        </header>
+        
+        <div class="search-wrapper">
+            <div class="search-input-box">
+                <div class="engine-toggle" id="engineToggle" role="button" aria-expanded="false" title="切换搜索引擎">
+                    <span id="currentEngineName">百度</span>
+                    <svg class="engine-chevron" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+                </div>
+                <span class="search-divider" aria-hidden="true"></span>
+                <input type="text" class="search-input" id="searchInput" placeholder="输入关键词搜索..." autocomplete="off">
+                <button type="button" class="search-clear-btn" id="searchClearBtn" aria-label="清空" title="清空" hidden>
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M18 6L6 18M6 6l12 12"></path>
+                    </svg>
+                </button>
+                <button type="button" class="search-submit-btn" id="searchSubmitBtn" aria-label="搜索" title="搜索">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="11" cy="11" r="7"></circle>
+                        <path d="M21 21l-4.3-4.3"></path>
+                    </svg>
+                </button>
+                <div class="engine-list" id="engineList"></div>
+            </div>
+        </div>
+
+        <main class="main-container" id="container"></main>
+    </div>
+
+    <!-- 网站详情弹窗 -->
+    <div class="modal-overlay" id="siteDetailModal" aria-hidden="true">
+        <div class="modal" style="max-width: 480px; padding: 32px; border-radius: 30px;">
+            <div class="icon-preview-wrap">
+                <div class="icon-preview" id="detailIconPreview">?</div>
+                <div style="overflow:hidden;">
+                    <h3 id="detailSiteTitle">网站名称</h3>
+                    <div id="detailSiteUrl">
+                        <span>https://example.com</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+                <label style="font-size:0.88rem; font-weight:600; color:var(--text-sub); margin-bottom:8px;">网站简介</label>
+                <div id="detailSiteDesc">暂无简介</div>
+            </div>
+            <div class="modal-btns" style="margin-top:30px; display:flex; justify-content:flex-end; gap:12px;">
+                <button class="btn btn-cancel" id="btnCloseDetail" type="button" style="border-radius:14px; padding:11px 22px;">关闭</button>
+                <button class="btn btn-confirm" id="btnGoToSite" type="button" style="border-radius:14px; padding:11px 22px;">前往网站 ➔</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 设置与添加链接大弹窗 -->
+    <div class="modal-overlay" id="settingsModal" aria-hidden="true">
+        <div class="modal">
+            <div class="settings-header-top">
+                <div class="settings-title-group">
+                    <h2>设置</h2>
+                    <p>管理导航内容与偏好。</p>
+                </div>
+                <button class="settings-close-btn" id="btnCloseSettings" type="button" aria-label="关闭设置">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path d="M18 6L6 18M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- 顶部横向标签导航 -->
+            <div class="settings-tabs-bar">
+                <button class="settings-tab-btn active" data-tab="tab-add" type="button">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+                    添加链接
+                </button>
+                <button class="settings-tab-btn" data-tab="tab-manage" type="button">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"></path></svg>
+                    链接管理
+                </button>
+                <button class="settings-tab-btn" data-tab="tab-engines" type="button">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
+                    搜索引擎
+                </button>
+                <button class="settings-tab-btn" data-tab="tab-appearance" type="button">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path></svg>
+                    外观设置
+                </button>
+                <button class="settings-tab-btn" data-tab="tab-sync" type="button">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                    同步
+                </button>
+            </div>
+
+            <form id="addLinkForm" class="settings-body-content" novalidate>
+                <!-- Tab 1: 添加链接面板 -->
+                <div class="settings-panel active" id="tab-add">
+                    <div class="settings-panel-title">添加新链接</div>
+
+                    <div class="settings-form-card">
+                        <div class="settings-field-group">
+                            <label for="linkUrlInput">URL (支持自动识别)</label>
+                            <div class="url-row-container">
+                                <div class="url-input-box">
+                                    <input type="text" id="linkUrlInput" class="settings-input" placeholder="example.com" autocomplete="off">
+                                </div>
+                                <button type="button" class="url-standalone-action-btn" title="自动抓取或解析信息" id="autoFetchBtn">
+                                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="settings-field-group">
+                            <label for="linkNameInput">标题 & 图标</label>
+                            <div class="url-row-container">
+                                <div class="url-input-box">
+                                    <input type="text" id="linkNameInput" class="settings-input" placeholder="输入标题" autocomplete="off">
+                                </div>
+                                <button type="button" class="url-standalone-action-btn" title="自定义图标/链接" id="customIconBtn">
+                                    <span id="iconPreviewContainer">
+                                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                                        </svg>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="settings-field-group">
+                            <label for="linkDescInput">链接简介</label>
+                            <div class="url-input-box" style="width:100%;">
+                                <input type="text" id="linkDescInput" class="settings-input" placeholder="可选，简短说明该链接" maxlength="120" autocomplete="off">
+                            </div>
+                        </div>
+
+                        <div class="settings-field-group">
+                            <label for="linkGroupSelect">选择分类</label>
+                            <div class="category-action-row">
+                                <select id="linkGroupSelect" class="settings-control" required></select>
+                                <button type="submit" class="add-link-action-btn">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    </svg>
+                                    添加链接
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="settings-field-group">
+                            <label for="linkSubGroupSelect">选择子分类 / 标签</label>
+                            <select id="linkSubGroupSelect" class="settings-control" required></select>
+                        </div>
+
+                        <div class="settings-field-group">
+                            <label class="rocket-toggle-label">
+                                <input type="checkbox" id="linkRocketInput" class="rocket-checkbox">
+                                <span>外网 / 加速器站点</span>
+                                <span class="rocket-tag">⚡</span>
+                            </label>
+                        </div>
+
+                    </div>
+
+                    <!-- 导入浏览器书签 -->
+                    <div class="settings-form-card import-bookmarks-card">
+                        <div class="import-bookmarks-header">
+                            <div class="import-bookmarks-title-row">
+                                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                                </svg>
+                                <span>导入浏览器书签</span>
+                            </div>
+                            <p class="import-bookmarks-desc">支持 Chrome / Edge / Firefox 导出的书签 HTML 文件，文件夹将自动转为分类。</p>
+                        </div>
+                        <div class="import-bookmarks-actions">
+                            <input type="file" id="bookmarkFileInput" accept=".html,.htm,text/html" hidden>
+                            <button type="button" class="add-link-action-btn import-bookmarks-btn" id="importBookmarksBtn">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                                选择书签文件
+                            </button>
+                        </div>
+                        <div class="import-bookmarks-hint">
+                            浏览器中打开「书签管理器」→ 导出书签为 HTML，再在此上传即可。
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 2: 链接管理面板 -->
+                <div class="settings-panel" id="tab-manage">
+                    <!-- 分类：新建大分类 / 二级分类 -->
+                    <div class="settings-form-card create-category-card">
+                        <div class="create-category-row">
+                            <div class="create-category-label">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                                <span>新建大分类</span>
+                            </div>
+                            <div class="create-category-action">
+                                <input type="text" id="newFolderNameInput" class="settings-control" placeholder="输入大分类名称…" autocomplete="off">
+                                <button type="button" class="add-link-action-btn" id="createNewFolderBtn">新建</button>
+                            </div>
+                        </div>
+                        <div class="create-category-divider"></div>
+                        <div class="create-category-row">
+                            <div class="create-category-label">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                <span>新建二级分类</span>
+                            </div>
+                            <div class="create-category-action create-sub-action">
+                                <select id="newSubGroupParentSelect" class="settings-control" title="所属大分类"></select>
+                                <input type="text" id="newSubGroupNameInput" class="settings-control" placeholder="输入二级分类名称…" autocomplete="off">
+                                <button type="button" class="add-link-action-btn" id="createNewSubGroupBtn">新建</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 批量操作栏 -->
+                    <div class="manage-batch-bar" id="manageBatchBar">
+                        <label style="display:flex; align-items:center; gap:6px; font-size: 0.85rem; cursor:pointer;">
+                            <input type="checkbox" id="selectAllCheckbox" style="width:16px; height:16px; accent-color:var(--primary); cursor:pointer;"> 全选
+                        </label>
+                        <div style="flex:1;"></div>
+                        <button type="button" class="manage-sub-btn" id="batchMoveBtn">批量移动</button>
+                        <button type="button" class="manage-sub-btn danger" id="batchDeleteBtn">批量删除</button>
+                        <button type="button" class="manage-sub-btn" id="batchCancelBtn">取消选择</button>
+                    </div>
+
+                    <div class="manage-top-bar">
+                        <span>按住卡片即可拖动排序</span>
+                        <div class="manage-top-bar-right">
+                            <button type="button" class="manage-sub-btn" id="manageCollapseAllBtn" title="全部折叠">全部折叠</button>
+                            <button type="button" class="manage-sub-btn" id="manageExpandAllBtn" title="全部展开">全部展开</button>
+                            <span id="manageCategoryCount">0 个分类</span>
+                        </div>
+                    </div>
+                    <div class="manage-search-box">
+                        <svg class="manage-search-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <input type="text" id="manageSearchInput" placeholder="搜索书签标题或 URL..." autocomplete="off">
+                    </div>
+                    <div id="manageGroupsContainer">
+                        <!-- 动态渲染的分类、二级分类与链接列表 -->
+                    </div>
+                </div>
+
+                <!-- Tab 3: 搜索引擎管理面板 -->
+                <div class="settings-panel" id="tab-engines">
+                    <div class="settings-form-card search-engine-manage-card collapsible-card" data-collapsed="true" id="engineListCollapsible">
+                        <button type="button" class="sync-section-header engine-manage-toggle" id="engineListToggle" aria-expanded="false">
+                            <div class="sync-section-title">
+                                <div class="import-bookmarks-title-row">
+                                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <circle cx="11" cy="11" r="8"></circle>
+                                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                    </svg>
+                                    <span>搜索引擎管理</span>
+                                    <span class="manage-section-count" id="engineListCount">0</span>
+                                </div>
+                                <p class="import-bookmarks-desc">管理搜索框可切换的搜索引擎，支持上下拖动排序、编辑与增删。</p>
+                            </div>
+                            <svg class="sync-chevron" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </button>
+                        <div class="sync-section-body engine-list-body">
+                            <div id="manageEngineList" class="manage-engine-list">
+                                <!-- 动态渲染搜索引擎列表 -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-form-card settings-card-spaced">
+                        <div class="create-category-row">
+                            <div class="create-category-label">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                <span>添加新搜索引擎</span>
+                            </div>
+                            <div class="add-engine-form">
+                                <div class="add-engine-inputs">
+                                    <input type="text" id="newEngineNameInput" class="settings-control" placeholder="名称（如：GitHub）" autocomplete="off">
+                                    <input type="text" id="newEngineUrlInput" class="settings-control" placeholder="URL（含 %s 或直接拼在末尾）" autocomplete="off">
+                                </div>
+                                <div class="add-engine-actions">
+                                    <label class="rocket-toggle-label">
+                                        <input type="checkbox" id="newEngineRocketInput" class="rocket-checkbox">
+                                        <span>外网 / 加速器</span>
+                                        <span class="rocket-tag">⚡</span>
+                                    </label>
+                                    <button type="button" class="add-link-action-btn" id="addNewEngineBtn">添加引擎</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 5: 外观设置面板 -->
+                <div class="settings-panel" id="tab-appearance">
+                    <div class="settings-panel-title">主题与外观微调</div>
+                    <div class="settings-form-card theme-mode-card">
+                        <div class="theme-mode-label">主题模式</div>
+                        <div class="theme-mode-select-wrap" id="themeModeSelectWrap">
+                            <button type="button" class="theme-mode-trigger" id="themeModeTrigger" aria-haspopup="listbox" aria-expanded="false">
+                                <span class="theme-mode-trigger-left">
+                                    <span class="theme-mode-icon" id="themeModeIcon">
+                                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                            <rect x="2" y="3" width="20" height="14" rx="2"></rect>
+                                            <line x1="8" y1="21" x2="16" y2="21"></line>
+                                            <line x1="12" y1="17" x2="12" y2="21"></line>
+                                        </svg>
+                                    </span>
+                                    <span id="themeModeLabel">跟随系统</span>
+                                </span>
+                                <svg class="theme-mode-chevron" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </button>
+                            <div class="theme-mode-dropdown" id="themeModeDropdown" role="listbox" hidden>
+                                <button type="button" class="theme-mode-option" data-value="system" role="option">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                                    <span>跟随系统</span>
+                                </button>
+                                <button type="button" class="theme-mode-option" data-value="dark" role="option">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                                    <span>深色</span>
+                                </button>
+                                <button type="button" class="theme-mode-option" data-value="light" role="option">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                                    <span>浅色</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-form-card home-layout-card">
+                        <div class="theme-mode-label">首页布局</div>
+                        <div class="home-layout-tabs" id="homeLayoutTabs" role="tablist">
+                            <button type="button" class="home-layout-btn" data-layout="folder" role="tab" aria-selected="false">文件夹模式</button>
+                            <button type="button" class="home-layout-btn active" data-layout="direct" role="tab" aria-selected="true">直显模式</button>
+                        </div>
+                        <p class="home-layout-desc" id="homeLayoutDesc">直接展示所有分类与链接，适合内容较少时一览无余</p>
+                    </div>
+
+                    <div class="settings-form-card accent-color-card">
+                        <div class="theme-mode-label">强调色 — 预设</div>
+                        <div class="accent-swatch-row" id="accentSwatchRow" role="listbox" aria-label="强调色预设">
+                            <button type="button" class="accent-swatch active" data-accent="blue" data-color="#3b82f6" title="蓝" aria-label="蓝" role="option" aria-selected="true" style="background:#3b82f6"></button>
+                            <button type="button" class="accent-swatch" data-accent="violet" data-color="#8b5cf6" title="紫" aria-label="紫" role="option" aria-selected="false" style="background:#8b5cf6"></button>
+                            <button type="button" class="accent-swatch" data-accent="green" data-color="#10b981" title="绿" aria-label="绿" role="option" aria-selected="false" style="background:#10b981"></button>
+                            <button type="button" class="accent-swatch" data-accent="yellow" data-color="#eab308" title="黄" aria-label="黄" role="option" aria-selected="false" style="background:#eab308"></button>
+                            <button type="button" class="accent-swatch" data-accent="orange" data-color="#f97316" title="橙" aria-label="橙" role="option" aria-selected="false" style="background:#f97316"></button>
+                        </div>
+                        <div class="accent-custom-block">
+                            <div class="theme-mode-label">自定义颜色</div>
+                            <div class="accent-custom-row">
+                                <label class="accent-color-picker-wrap" title="选择颜色">
+                                    <input type="color" id="accentColorPicker" value="#3b82f6" aria-label="自定义强调色">
+                                </label>
+                                <input type="text" id="accentHexInput" class="settings-input accent-hex-input" value="#3b82f6" maxlength="7" spellcheck="false" autocomplete="off" aria-label="颜色十六进制">
+                            </div>
+                            <div class="accent-preview-row">
+                                <span class="accent-preview-chip accent-preview-light" id="accentPreviewLight">#3b82f6 浅色背景</span>
+                                <span class="accent-preview-chip accent-preview-dark" id="accentPreviewDark">#3b82f6 深色背景</span>
+                            </div>
+                            <p class="accent-contrast-warn" id="accentContrastWarn" hidden></p>
+                        </div>
+                    </div>
+
+                    <div class="settings-form-card appearance-slider-card">
+                        <div class="appearance-slider-item">
+                            <div class="appearance-slider-header">
+                                <span class="appearance-slider-title">遮罩暗化</span>
+                                <span class="appearance-slider-value" id="maskDarkenValue">10%</span>
+                            </div>
+                            <input type="range" id="maskDarkenSlider" class="appearance-slider" min="0" max="100" value="10" step="1" aria-label="遮罩暗化">
+                            <p class="appearance-slider-desc">控制壁纸遮罩深度，并同步压暗搜索栏与二级目录卡片</p>
+                        </div>
+                        <div class="appearance-slider-item">
+                            <div class="appearance-slider-header">
+                                <span class="appearance-slider-title">卡片透明度</span>
+                                <span class="appearance-slider-value" id="cardOpacityValue">60%</span>
+                            </div>
+                            <input type="range" id="cardOpacitySlider" class="appearance-slider" min="0" max="100" value="60" step="1" aria-label="卡片透明度">
+                            <p class="appearance-slider-desc">控制链接卡片、搜索框与二级目录相关卡片背景的透明度（越低越透）</p>
+                        </div>
+                    </div>
+
+                    <div class="settings-form-card wallpaper-card">
+                        <div class="theme-mode-label">壁纸模式</div>
+                        <div class="wallpaper-mode-tabs" id="wallpaperModeTabs" role="tablist">
+                            <button type="button" class="wallpaper-mode-btn active" data-mode="default" role="tab" aria-selected="true">默认</button>
+                            <button type="button" class="wallpaper-mode-btn" data-mode="local" role="tab" aria-selected="false">本地</button>
+                            <button type="button" class="wallpaper-mode-btn" data-mode="api" role="tab" aria-selected="false">API</button>
+                            <button type="button" class="wallpaper-mode-btn" data-mode="network" role="tab" aria-selected="false">网络图片</button>
+                        </div>
+                        <!-- 默认：无自定义壁纸 -->
+                        <div class="wallpaper-mode-panel" id="wallpaperPanelDefault">
+                            <p class="wallpaper-hint">使用当前主题的默认背景，不加载任何自定义壁纸。</p>
+                        </div>
+                        <!-- 本地说明 + 换一张（仅本地模式） -->
+                        <div class="wallpaper-mode-panel" id="wallpaperPanelLocal" hidden>
+                            <div class="wallpaper-cache-bar">
+                                <div class="wallpaper-cache-info">
+                                    <span class="wallpaper-cache-icon" aria-hidden="true">
+                                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                            <polyline points="21 15 16 10 5 21"></polyline>
+                                        </svg>
+                                    </span>
+                                    <span id="wallpaperCacheText">当前缓存 · 暂无壁纸</span>
+                                </div>
+                                <button type="button" class="wallpaper-refresh-btn" id="wallpaperRefreshBtn" title="换一张壁纸">
+                                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <polyline points="23 4 23 10 17 10"></polyline>
+                                        <polyline points="1 20 1 14 7 14"></polyline>
+                                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                                    </svg>
+                                    换一张
+                                </button>
+                            </div>
+                            <p class="wallpaper-hint">将图片放入 <code>wallpaper/Landscape</code>（横屏）与 <code>wallpaper/Portrait</code>（竖屏），并在 <code>js/config.js</code> 的 <code>LOCAL_WALLPAPERS</code> 中登记文件名；旋转设备会自动切换。</p>
+                        </div>
+                        <!-- API -->
+                        <div class="wallpaper-mode-panel" id="wallpaperPanelApi" hidden>
+                            <label class="wallpaper-field-label" for="wallpaperApiUrl">API 地址</label>
+                            <input type="url" id="wallpaperApiUrl" class="settings-control" placeholder="例如: https://source.unsplash.com/random/1920x1080" autocomplete="off">
+                            <p class="wallpaper-hint">填写返回图片 URL 的接口地址，或直接填写图片直链。按回车应用。</p>
+                        </div>
+                        <!-- 网络图片 -->
+                        <div class="wallpaper-mode-panel" id="wallpaperPanelNetwork" hidden>
+                            <label class="wallpaper-field-label">图片链接</label>
+                            <div class="wallpaper-upload-box" id="wallpaperUploadBox">
+                                <div class="wallpaper-upload-header">
+                                    <span class="wallpaper-upload-title">上传图片</span>
+                                    <span class="wallpaper-upload-support">支持本地选择（生成 Data URL）</span>
+                                </div>
+                                <p class="wallpaper-upload-desc">上传图片后，系统会自动生成链接并填充到下方输入框</p>
+                                <button type="button" class="wallpaper-upload-btn" id="wallpaperUploadBtn">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="17 8 12 3 7 8"></polyline>
+                                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                                    </svg>
+                                    选择图片上传
+                                </button>
+                                <input type="file" id="wallpaperFileInput" accept="image/jpeg,image/png,image/webp,image/gif,image/avif,image/bmp" hidden>
+                            </div>
+                            <label class="wallpaper-field-label" for="wallpaperNetworkUrl">图片直链</label>
+                            <input type="url" id="wallpaperNetworkUrl" class="settings-control" placeholder="请输入图片直链 (例如: https://example.com/bg.jpg)" autocomplete="off">
+                            <p class="wallpaper-hint">支持直接输入图片链接，或使用上方上传功能自动生成。按回车应用。</p>
+                        </div>
+                    </div>
+
+
+                    <div class="settings-form-card appearance-reset-card">
+                        <div class="sync-section-title">恢复默认外观</div>
+                        <div class="sync-card-desc">
+                            将主题模式、首页布局、遮罩暗化、卡片透明度与壁纸模式恢复为初始默认值。
+                        </div>
+                        <div class="sync-actions">
+                            <button type="button" class="sync-action-btn" id="resetAppearanceBtn">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <polyline points="1 4 1 10 7 10"></polyline>
+                                    <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                                </svg>
+                                恢复默认值
+                            </button>
+                        </div>
+                        <div class="sync-card-hint">
+                            默认：主题跟随系统 · 默认蓝 · 直显布局 · 遮罩 10% · 卡片透明度 60% · 壁纸默认。
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Tab 6: 同步面板 -->
+                <div class="settings-panel" id="tab-sync">
+                    <div class="settings-panel-title">数据备份与多端同步</div>
+
+                    <!-- 统一存储类型面板 -->
+                    <div class="settings-form-card sync-card">
+                        <div class="webdav-form">
+                            <div class="settings-field-group">
+                                <label for="syncStorageType">存储类型</label>
+                                <select id="syncStorageType" class="settings-control">
+                                    <option value="webdav">WebDAV</option>
+                                    <option value="github">GitHub 仓库</option>
+                                    <option value="s3">S3 / Cloudflare R2</option>
+                                    <option value="local">本地备份</option>
+                                    <option value="deploy">部署同步</option>
+                                </select>
+                            </div>
+
+                            <!-- WebDAV -->
+                            <div class="sync-storage-panel" id="syncPanelWebdav" data-type="webdav">
+                                <div class="settings-field-group">
+                                    <label for="webdavUrl">WebDAV URL</label>
+                                    <input type="url" id="webdavUrl" class="settings-input" placeholder="https://dav.jianguoyun.com/dav/" autocomplete="off">
+                                </div>
+                                <div class="webdav-creds-row">
+                                    <div class="settings-field-group">
+                                        <label for="webdavUser">用户名</label>
+                                        <input type="text" id="webdavUser" class="settings-input" placeholder="用户名 / 邮箱" autocomplete="username">
+                                    </div>
+                                    <div class="settings-field-group">
+                                        <label for="webdavPass">密码</label>
+                                        <input type="password" id="webdavPass" class="settings-input" placeholder="应用密码" autocomplete="current-password">
+                                    </div>
+                                </div>
+                                <div class="settings-field-group">
+                                    <label for="webdavPath">文件路径</label>
+                                    <input type="text" id="webdavPath" class="settings-input" placeholder="/data.json" value="/data.json" autocomplete="off">
+                                </div>
+                                <div class="webdav-warning webdav-warning-cors">
+                                    <span class="webdav-warning-icon">!</span>
+                                    <div>
+                                        <strong>WebDAV CORS 警告</strong>
+                                        <p>浏览器安全策略要求 WebDAV 服务器允许跨域访问 (CORS)。很多私有云盘或 NAS 默认未开启 CORS，可能导致连接失败。</p>
+                                    </div>
+                                </div>
+                                <div class="webdav-warning webdav-warning-auth">
+                                    <span class="webdav-warning-icon">!</span>
+                                    <div>
+                                        <strong>同步机制与认证警告</strong>
+                                        <p>使用应用专用密码而非登录密码；数据以 JSON 明文存储于远程路径，请确保 WebDAV 访问权限仅限本人。连接失败时请检查 CORS 与路径是否正确。</p>
+                                    </div>
+                                </div>
+                                <div class="sync-actions">
+                                    <button type="button" class="sync-action-btn" id="webdavTestBtn">测试连接</button>
+                                    <button type="button" class="sync-action-btn" id="webdavUploadBtn">上传到云端</button>
+                                    <button type="button" class="sync-action-btn primary" id="webdavDownloadBtn">从云端下载</button>
+                                </div>
+                                <div class="sync-card-hint" id="webdavStatusHint">配置将保存在本地浏览器，不会上传账号密码到本站。</div>
+                            </div>
+
+                            <!-- GitHub 仓库 -->
+                            <div class="sync-storage-panel" id="syncPanelGithub" data-type="github" hidden>
+                                <div class="settings-field-group">
+                                    <label for="githubToken">Token (需要 repo 权限)</label>
+                                    <input type="password" id="githubToken" class="settings-input" placeholder="ghp_…" autocomplete="off">
+                                </div>
+                                <div class="webdav-creds-row">
+                                    <div class="settings-field-group">
+                                        <label for="githubOwner">用户名</label>
+                                        <input type="text" id="githubOwner" class="settings-input" placeholder="Username" autocomplete="username">
+                                    </div>
+                                    <div class="settings-field-group">
+                                        <label for="githubRepo">仓库名</label>
+                                        <input type="text" id="githubRepo" class="settings-input" placeholder="Repo Name" autocomplete="off">
+                                    </div>
+                                </div>
+                                <div class="webdav-creds-row">
+                                    <div class="settings-field-group">
+                                        <label for="githubBranch">分支</label>
+                                        <input type="text" id="githubBranch" class="settings-input" placeholder="main" value="main" autocomplete="off">
+                                    </div>
+                                    <div class="settings-field-group">
+                                        <label for="githubPath">文件路径</label>
+                                        <input type="text" id="githubPath" class="settings-input" placeholder="public/data.json" value="public/data.json" autocomplete="off">
+                                    </div>
+                                </div>
+                                <div class="webdav-warning webdav-warning-auth github-sync-warning">
+                                    <span class="webdav-warning-icon">!</span>
+                                    <div>
+                                        <strong>同步机制与延迟警告</strong>
+                                        <p>刷新页面：从云端拉取数据（智能合并本地新增）。</p>
+                                        <p>点击保存：将本地数据推送到云端（覆盖云端旧数据）。</p>
+                                        <p>CDN 延迟：保存后可能需 1-5 分钟生效，请勿频繁操作！</p>
+                                    </div>
+                                </div>
+                                <div class="sync-actions">
+                                    <button type="button" class="sync-action-btn" id="githubTestBtn">测试连接</button>
+                                    <button type="button" class="sync-action-btn" id="githubUploadBtn">保存到云端</button>
+                                    <button type="button" class="sync-action-btn primary" id="githubDownloadBtn">从云端拉取</button>
+                                </div>
+                                <div class="sync-card-hint" id="githubStatusHint">Token 与仓库配置仅保存在本地浏览器，不会上传到本站。</div>
+                            </div>
+
+                            <!-- S3 / Cloudflare R2 -->
+                            <div class="sync-storage-panel" id="syncPanelS3" data-type="s3" hidden>
+                                <div class="settings-field-group">
+                                    <label for="s3Endpoint">Endpoint (服务地址)</label>
+                                    <input type="url" id="s3Endpoint" class="settings-input" placeholder="https://<ACCOUNT_ID>.r2.cloudflarestorage.com" autocomplete="off">
+                                </div>
+                                <div class="webdav-creds-row">
+                                    <div class="settings-field-group">
+                                        <label for="s3AccessKeyId">Access Key ID</label>
+                                        <input type="text" id="s3AccessKeyId" class="settings-input" placeholder="Access Key ID" autocomplete="off">
+                                    </div>
+                                    <div class="settings-field-group">
+                                        <label for="s3SecretAccessKey">Secret Access Key</label>
+                                        <input type="password" id="s3SecretAccessKey" class="settings-input" placeholder="Secret Access Key" autocomplete="off">
+                                    </div>
+                                </div>
+                                <div class="webdav-creds-row">
+                                    <div class="settings-field-group">
+                                        <label for="s3Bucket">Bucket</label>
+                                        <input type="text" id="s3Bucket" class="settings-input" placeholder="my-bucket" autocomplete="off">
+                                    </div>
+                                    <div class="settings-field-group">
+                                        <label for="s3PublicUrl">Public URL (公开访问域名)</label>
+                                        <input type="url" id="s3PublicUrl" class="settings-input" placeholder="可选: https://pub-xxx.r2.dev (用于壁纸直链)" autocomplete="off">
+                                    </div>
+                                </div>
+                                <div class="settings-field-group">
+                                    <label for="s3Path">文件路径</label>
+                                    <input type="text" id="s3Path" class="settings-input" placeholder="data.json" value="data.json" autocomplete="off">
+                                </div>
+                                <div class="webdav-warning webdav-warning-cors">
+                                    <span class="webdav-warning-icon">!</span>
+                                    <div>
+                                        <strong>必须配置 CORS 策略</strong>
+                                        <p>由于浏览器安全限制，你必须在 S3/R2 后台配置 CORS 规则，允许你自己的域名访问。具体配置请参考 docs/storage 文档或 Cloudflare R2 / 对象存储 CORS 说明。</p>
+                                    </div>
+                                </div>
+                                <div class="sync-actions">
+                                    <button type="button" class="sync-action-btn" id="s3TestBtn">测试连接</button>
+                                    <button type="button" class="sync-action-btn" id="s3UploadBtn">上传到云端</button>
+                                    <button type="button" class="sync-action-btn primary" id="s3DownloadBtn">从云端下载</button>
+                                </div>
+                                <div class="sync-card-hint" id="s3StatusHint">Access Key 与配置仅保存在本地浏览器，不会上传到本站。</div>
+                            </div>
+
+                            <!-- 本地备份 -->
+                            <div class="sync-storage-panel" id="syncPanelLocal" data-type="local" hidden>
+                                <div class="sync-card-desc">
+                                    导出完整配置为 JSON（含分类链接 + 搜索引擎），可在其他设备导入恢复。适合临时备份或跨浏览器迁移。
+                                </div>
+                                <div class="sync-actions">
+                                    <button type="button" class="sync-action-btn" id="exportDataBtn">
+                                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                            <polyline points="7 10 12 15 17 10"></polyline>
+                                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                                        </svg>
+                                        导出 JSON
+                                    </button>
+                                    <button type="button" class="sync-action-btn primary" id="importDataBtn">
+                                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                            <polyline points="17 8 12 3 7 8"></polyline>
+                                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                                        </svg>
+                                        导入 JSON
+                                    </button>
+                                    <input type="file" id="importDataFileInput" accept=".json,.js,application/json,text/javascript" hidden>
+                                </div>
+                                <div class="sync-card-hint">
+                                    导入将覆盖当前导航与搜索引擎数据，请先导出备份。支持本站导出的 JSON，或从导出的 data.js 中解析。
+                                </div>
+                            </div>
+
+                            <!-- 部署同步 -->
+                            <div class="sync-storage-panel" id="syncPanelDeploy" data-type="deploy" hidden>
+                                <div class="sync-card-desc">
+                                    将当前配置导出为可直接替换仓库中的 <code>js/data.js</code>。推送到 Pages 后，新访客或其他设备清除本地数据即可使用最新默认导航，实现多端同步。
+                                </div>
+                                <div class="sync-actions">
+                                    <button type="button" class="sync-action-btn primary" id="exportDataJsBtn">
+                                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                            <polyline points="14 2 14 8 20 8"></polyline>
+                                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                                            <polyline points="10 9 9 9 8 9"></polyline>
+                                        </svg>
+                                        导出 data.js
+                                    </button>
+                                </div>
+                                <div class="sync-card-hint">
+                                    工作流：本页编辑 → 导出 data.js → 替换仓库 <code>js/data.js</code> → git push → 部署完成。其他设备点击下方「清除本地数据」后刷新即可加载新默认。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 数据清理（下拉选择，样式对齐存储类型） -->
+                    <div class="settings-form-card sync-card">
+                        <div class="webdav-form">
+                            <div class="settings-field-group">
+                                <label for="dataCleanupType">数据清理</label>
+                                <select id="dataCleanupType" class="settings-control">
+                                    <option value="clear-bookmarks">清空所有书签</option>
+                                    <option value="reset-local">清除本地数据</option>
+                                </select>
+                            </div>
+                            <div class="webdav-warning webdav-warning-cors" id="dataCleanupHintClear">
+                                <span class="webdav-warning-icon">!</span>
+                                <div>
+                                    <strong>清空所有书签</strong>
+                                    <p>删除全部分类下的链接，保留大分类与二级分类；搜索引擎与外观设置不受影响。此操作不可撤销，建议先导出 JSON 备份。</p>
+                                </div>
+                            </div>
+                            <div class="webdav-warning webdav-warning-auth" id="dataCleanupHintReset" hidden>
+                                <span class="webdav-warning-icon">!</span>
+                                <div>
+                                    <strong>清除本地数据</strong>
+                                    <p>移除导航与搜索引擎相关 localStorage，下次加载使用站点 <code>js/data.js</code> 默认数据；主题、壁纸、侧边栏状态不受影响。</p>
+                                </div>
+                            </div>
+                            <div class="sync-actions">
+                                <button type="button" class="sync-action-btn danger" id="dataCleanupExecBtn">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                    </svg>
+                                    执行清理
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 通用确认弹窗 -->
+    <div class="modal-overlay" id="confirmModal" aria-hidden="true">
+        <div class="modal" style="max-width: 400px; padding: 28px; border-radius: 22px;">
+            <h3 id="confirmTitle" style="font-size: 1.15rem; font-weight: 700; margin-bottom: 12px; color: var(--text-main);">确认操作</h3>
+            <p id="confirmMessage" style="font-size: 0.95rem; color: var(--text-sub); line-height: 1.55; margin-bottom: 24px;"></p>
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" class="btn btn-cancel" id="confirmCancelBtn" style="border-radius: 12px; padding: 10px 20px; background: var(--modal-input-bg); border: 1px solid var(--border-normal); color: var(--text-main); cursor: pointer;">取消</button>
+                <button type="button" class="btn btn-confirm" id="confirmOkBtn" style="border-radius: 12px; padding: 10px 20px; background: var(--primary); border: none; color: #fff; cursor: pointer; font-weight: 600;">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 通用输入弹窗 -->
+    <div class="modal-overlay" id="promptModal" aria-hidden="true">
+        <div class="modal" style="max-width: 420px; padding: 28px; border-radius: 22px;">
+            <h3 id="promptTitle" style="font-size: 1.15rem; font-weight: 700; margin-bottom: 8px; color: var(--text-main);">输入</h3>
+            <p id="promptHint" style="font-size: 0.88rem; color: var(--text-sub); margin-bottom: 16px; line-height: 1.5; white-space: pre-wrap;"></p>
+            <input type="text" id="promptInput" class="settings-control" style="width: 100%; margin-bottom: 20px;" autocomplete="off">
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" class="btn btn-cancel" id="promptCancelBtn" style="border-radius: 12px; padding: 10px 20px; background: var(--modal-input-bg); border: 1px solid var(--border-normal); color: var(--text-main); cursor: pointer;">取消</button>
+                <button type="button" class="btn btn-confirm" id="promptOkBtn" style="border-radius: 12px; padding: 10px 20px; background: var(--primary); border: none; color: #fff; cursor: pointer; font-weight: 600;">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 通用提示弹窗 -->
+    <div class="modal-overlay" id="alertModal" aria-hidden="true">
+        <div class="modal" style="max-width: 380px; padding: 28px; border-radius: 22px;">
+            <p id="alertMessage" style="font-size: 0.98rem; color: var(--text-main); line-height: 1.55; margin-bottom: 22px; text-align: center;"></p>
+            <div style="display: flex; justify-content: center;">
+                <button type="button" class="btn btn-confirm" id="alertOkBtn" style="border-radius: 12px; padding: 10px 28px; background: var(--primary); border: none; color: #fff; cursor: pointer; font-weight: 600;">知道了</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 移动选择弹窗 -->
+    <div class="modal-overlay" id="moveModal" aria-hidden="true">
+        <div class="modal move-modal">
+            <h3 id="moveTitle" class="move-modal-title">选择目标分类</h3>
+            <p id="moveHint" class="move-modal-hint"></p>
+            <div id="moveTargetList" class="move-target-list"></div>
+            <div class="move-modal-footer">
+                <button type="button" class="btn btn-cancel" id="moveCancelBtn">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑链接弹窗 -->
+    <div class="modal-overlay" id="editLinkModal" aria-hidden="true">
+        <div class="modal edit-link-modal">
+            <div class="edit-link-header">
+                <div>
+                    <h2>编辑链接</h2>
+                    <p>修改链接的标题、简介、URL 或图标。</p>
+                </div>
+                <button type="button" class="settings-close-btn" id="btnCloseEditLink" aria-label="关闭">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path d="M18 6L6 18M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="settings-field-group">
+                <label for="editLinkUrl">URL</label>
+                <div class="url-row-container">
+                    <div class="url-input-box">
+                        <input type="text" id="editLinkUrl" class="settings-input" placeholder="https://example.com" autocomplete="off">
+                    </div>
+                    <button type="button" class="url-standalone-action-btn" title="自动抓取信息" id="editLinkFetchBtn">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="settings-field-group">
+                <label for="editLinkName">标题</label>
+                <div class="url-input-box" style="width:100%;">
+                    <input type="text" id="editLinkName" class="settings-input" placeholder="链接标题" autocomplete="off">
+                </div>
+            </div>
+
+            <div class="settings-field-group">
+                <label for="editLinkDesc">链接简介</label>
+                <div class="url-input-box" style="width:100%;">
+                    <input type="text" id="editLinkDesc" class="settings-input" placeholder="可选，简短说明该链接" maxlength="120" autocomplete="off">
+                </div>
+            </div>
+
+            <div class="settings-field-group">
+                <label for="editLinkIcon">图标</label>
+                <div class="url-row-container">
+                    <button type="button" class="url-standalone-action-btn" id="editLinkIconPreview" title="图标预览" style="pointer-events:none;">
+                        <span id="editLinkIconInner">?</span>
+                    </button>
+                    <div class="url-input-box">
+                        <input type="text" id="editLinkIcon" class="settings-input" placeholder="图标 URL 或本地路径（可留空自动获取）" autocomplete="off">
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-field-group">
+                <label class="rocket-toggle-label">
+                    <input type="checkbox" id="editLinkRocket" class="rocket-checkbox">
+                    <span>外网 / 加速器站点</span>
+                    <span class="rocket-tag">⚡</span>
+                </label>
+            </div>
+
+            <div class="edit-link-footer">
+                <button type="button" class="btn btn-cancel" id="editLinkCancelBtn">取消</button>
+                <button type="button" class="btn btn-confirm" id="editLinkSaveBtn">保存修改</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑搜索引擎弹窗 -->
+    <div class="modal-overlay" id="editEngineModal" aria-hidden="true">
+        <div class="modal edit-link-modal">
+            <div class="edit-link-header">
+                <div>
+                    <h2>编辑搜索引擎</h2>
+                    <p>修改搜索引擎的名称、URL 或加速器状态。</p>
+                </div>
+                <button type="button" class="settings-close-btn" id="btnCloseEditEngine" aria-label="关闭">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path d="M18 6L6 18M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="settings-field-group">
+                <label for="editEngineName">引擎名称</label>
+                <div class="url-input-box" style="width:100%;">
+                    <input type="text" id="editEngineName" class="settings-input" placeholder="搜索引擎名称" autocomplete="off">
+                </div>
+            </div>
+
+            <div class="settings-field-group">
+                <label for="editEngineUrl">URL (包含 %s 或直接拼在末尾)</label>
+                <div class="url-input-box" style="width:100%;">
+                    <input type="text" id="editEngineUrl" class="settings-input" placeholder="https://example.com/search?q=%s" autocomplete="off">
+                </div>
+            </div>
+
+            <div class="settings-field-group">
+                <label class="rocket-toggle-label">
+                    <input type="checkbox" id="editEngineRocket" class="rocket-checkbox">
+                    <span>外网 / 加速器站点</span>
+                    <span class="rocket-tag">⚡</span>
+                </label>
+            </div>
+
+            <div class="edit-link-footer">
+                <button type="button" class="btn btn-cancel" id="editEngineCancelBtn">取消</button>
+                <button type="button" class="btn btn-confirm" id="editEngineSaveBtn">保存修改</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 文件夹模式：一级分类内容对话框 -->
+    <div class="modal-overlay" id="folderModal" aria-hidden="true">
+        <div class="modal folder-modal">
+            <div class="folder-modal-header">
+                <div class="folder-modal-title-wrap">
+                    <button type="button" class="folder-modal-back" id="folderModalBackBtn" hidden>
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                    </button>
+                    <h3 class="folder-modal-title" id="folderModalTitle">分类</h3>
+                </div>
+                <button type="button" class="folder-modal-close" id="folderModalCloseBtn" aria-label="关闭">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="folder-modal-body" id="folderModalBody">
+                <!-- 二级文件夹 / 链接 动态渲染 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 自定义图标选择弹窗 -->
+    <div class="modal-overlay" id="iconPickerModal" aria-hidden="true">
+        <div class="modal icon-picker-modal" role="dialog" aria-labelledby="iconPickerTitle">
+            <div class="icon-picker-header">
+                <h3 id="iconPickerTitle">自定义图标</h3>
+                <button type="button" class="settings-close-btn" id="iconPickerCloseBtn" aria-label="关闭">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path d="M18 6L6 18M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="icon-picker-upload">
+                <input type="file" id="iconPickerFileInput" accept="image/jpeg,image/png,image/webp" hidden>
+                <button type="button" class="icon-picker-upload-btn" id="iconPickerUploadBtn">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    上传图标
+                </button>
+                <p class="icon-picker-hint">支持 JPG、PNG、WEBP 格式，大小不超过 2MB</p>
+            </div>
+            <div class="icon-picker-grid" id="iconPickerGrid">
+                <!-- 预设图标由 JS 填充 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ES Module：data → utils → app -->
+    <script type="module" src="js/app.js?v=20260816e"></script>
+</body>
+</html>

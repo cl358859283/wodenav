@@ -1,0 +1,5 @@
+/* components.css - 已拆分为多个文件，保留此文件仅作兼容重导出 */
+@import url('./components-cards.css');
+@import url('./components-settings.css');
+@import url('./components-sync.css');
+@import url('./components-manage.css');

@@ -1,0 +1,370 @@
+/* ========== 同步面板、WebDAV/GitHub/S3 表单 ========== */
+/* ===== 同步面板可折叠卡片 ===== */
+.collapsible-card {
+    padding: 0;
+    overflow: hidden;
+}
+.sync-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 14px 16px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text-main);
+    text-align: left;
+    gap: 12px;
+    transition: background 0.18s var(--ease-smooth);
+}
+.sync-section-header:hover {
+    background: rgba(59, 130, 246, 0.08);
+}
+html.light-mode .sync-section-header:hover {
+    background: rgba(37, 99, 235, 0.06);
+}
+.sync-section-header .sync-section-title {
+    flex: 1;
+    pointer-events: none;
+}
+.sync-chevron {
+    flex-shrink: 0;
+    transition: transform 0.25s var(--ease-smooth);
+    color: var(--text-sub);
+}
+.collapsible-card[data-collapsed="true"] .sync-chevron {
+    transform: rotate(-90deg);
+}
+.sync-section-body {
+    padding: 0 18px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+.collapsible-card[data-collapsed="true"] .sync-section-body {
+    display: none;
+}
+
+/* ===== WebDAV 表单（匹配图中样式） ===== */
+.webdav-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.sync-storage-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-top: 2px;
+}
+.sync-storage-panel[hidden] {
+    display: none !important;
+}
+.webdav-warning[hidden] {
+    display: none !important;
+}
+.webdav-creds-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+@media (max-width: 520px) {
+    .webdav-creds-row {
+        grid-template-columns: 1fr;
+    }
+}
+.webdav-form .settings-field-group label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 0;
+    letter-spacing: 0.01em;
+}
+.webdav-form .settings-input,
+.webdav-form .settings-control {
+    width: 100%;
+    padding: 11px 13px;
+    border-radius: 11px;
+    border: 1px solid var(--border-normal);
+    background-color: var(--modal-input-bg);
+    color: var(--text-main);
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+}
+.webdav-form .settings-input::placeholder,
+.webdav-form .settings-control::placeholder {
+    color: var(--text-sub);
+    opacity: 0.65;
+}
+.webdav-form .settings-input:focus,
+.webdav-form .settings-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-glow);
+    background-color: rgba(59, 130, 246, 0.04);
+}
+.webdav-warning {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 11px 13px;
+    border-radius: 11px;
+    font-size: 0.78rem;
+    line-height: 1.5;
+}
+.webdav-warning strong {
+    display: block;
+    margin-bottom: 3px;
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+.webdav-warning p {
+    margin: 0;
+    opacity: 0.92;
+}
+.webdav-warning-icon {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    margin-top: 1px;
+}
+.webdav-warning-cors {
+    background: rgba(234, 179, 8, 0.12);
+    border: 1px solid rgba(234, 179, 8, 0.35);
+    color: #eab308;
+}
+.webdav-warning-cors .webdav-warning-icon {
+    background: rgba(234, 179, 8, 0.25);
+    color: #eab308;
+}
+.webdav-warning-auth {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    color: #ef4444;
+}
+.webdav-warning-auth .webdav-warning-icon {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+html.light-mode .webdav-warning-cors {
+    background: rgba(234, 179, 8, 0.08);
+    color: #a16207;
+}
+html.light-mode .webdav-warning-auth {
+    background: rgba(239, 68, 68, 0.08);
+    color: #b91c1c;
+}
+.github-sync-warning p {
+    margin: 2px 0 0;
+}
+.github-sync-warning p + p {
+    margin-top: 4px;
+}
+
+.settings-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+.settings-field-group label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-main);
+    letter-spacing: 0.01em;
+    opacity: 0.92;
+}
+
+.settings-input {
+    flex: 1;
+    padding: 12px 14px;
+    background: transparent;
+    border: none;
+    color: var(--text-main);
+    font-size: 0.95rem;
+    outline: none;
+}
+
+/* ==================== 独立分离卡片按钮样式 ==================== */
+.url-row-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.url-input-box {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    background: var(--modal-input-bg);
+    border: 1px solid var(--border-normal);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.25s var(--ease-smooth);
+}
+.url-input-box:focus-within {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+.url-standalone-action-btn {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    background: var(--card-glass-bg);
+    border: 1px solid var(--border-normal);
+    border-radius: 12px;
+    color: var(--secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px var(--shadow-color);
+    transition: all 0.25s var(--ease-smooth);
+    backdrop-filter: var(--glass-blur);
+    overflow: hidden;
+    font-size: 15px;
+    font-weight: 700;
+}
+.url-standalone-action-btn img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.url-standalone-action-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: var(--primary-glow);
+    transform: translateY(-1px);
+}
+.url-standalone-action-btn:active {
+    transform: scale(0.95);
+}
+
+.category-action-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+.category-action-row select {
+    flex: 1;
+}
+.add-link-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 18px;
+    height: 42px;
+    background: #ffffff;
+    color: #09090b;
+    border: none;
+    border-radius: 11px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s var(--ease-smooth);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+.add-link-action-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+html.light-mode .add-link-action-btn {
+    background: #0f172a;
+    color: #ffffff;
+}
+
+.settings-control {
+    width: 100%;
+    padding: 11px 13px;
+    background-color: var(--modal-input-bg);
+    border: 1px solid var(--border-normal);
+    border-radius: 11px;
+    color: var(--text-main);
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s var(--ease-smooth), box-shadow 0.2s var(--ease-smooth), background-color 0.2s;
+}
+.settings-control::placeholder {
+    color: var(--text-sub);
+    opacity: 0.65;
+}
+.settings-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-glow);
+    background-color: rgba(59, 130, 246, 0.04);
+}
+
+.create-category-card {
+    margin-bottom: 16px;
+    gap: 14px;
+}
+.create-category-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.create-category-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text-main);
+    letter-spacing: -0.01em;
+}
+.create-category-label svg {
+    opacity: 0.7;
+    flex-shrink: 0;
+}
+.create-category-action {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+.create-category-action .settings-control {
+    flex: 1;
+    min-width: 0;
+}
+.create-category-action .add-link-action-btn {
+    flex-shrink: 0;
+    height: 42px;
+    padding: 0 16px;
+}
+.create-sub-action {
+    flex-wrap: wrap;
+}
+.create-sub-action select {
+    flex: 0 1 140px;
+    min-width: 100px;
+}
+.create-sub-action input {
+    flex: 1 1 120px;
+}
+.create-category-divider {
+    height: 1px;
+    background: var(--border-normal);
+    margin: 2px 0;
+}
+@media (max-width: 640px) {
+    .create-category-action {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .create-category-action .add-link-action-btn {
+        width: 100%;
+    }
+    .create-sub-action select {
+        flex: 1 1 auto;
+        width: 100%;
+    }
+}
+

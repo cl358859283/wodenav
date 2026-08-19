@@ -1,0 +1,100 @@
+/**
+ * variables.css — 全局 CSS 变量（出厂默认）
+ *
+ * - 强调色 --primary / --primary-glow 会在运行时由 theme.js 按用户选择覆盖
+ * - FAB 尺寸在桌面宽屏下还会被 responsive.css 的 min-width 媒体查询覆盖
+ *   修改 PC 按钮大小时请同步改本文件与 responsive.css
+ * - 卡片透明度 / 遮罩相关会由 theme.js 根据外观滑块写入
+ */
+/* ========== 主题变量 ========== */
+:root {
+    /* 间距节奏 */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 24px;
+    --space-6: 32px;
+    --space-7: 42px;
+
+    /* 主色（可由强调色预设 / 自定义通过 JS 覆盖） */
+    --primary: #3b82f6;
+    --primary-glow: rgba(59, 130, 246, 0.25);
+    --secondary: #93c5fd;
+    --secondary-text: #1e3a8a;
+    --highlight: #bfdbfe;
+    --on-primary: #ffffff; /* FAB / 主色按钮上的图标与文字，按强调色亮度由 JS 覆盖 */
+
+    --bg-dark: #09090b;
+    --text-main: #f4f4f5;
+    --text-sub: #a1a1aa;
+    --border-normal: rgba(255, 255, 255, 0.08);
+    --danger: #ef4444;
+    --danger-glow: rgba(239, 68, 68, 0.25);
+    --bg-gradient: radial-gradient(circle at 50% -15%, #181824 0%, #09090b 85%);
+    --card-bg-alpha: 0.60;
+    --card-glass-bg: rgba(24, 24, 27, var(--card-bg-alpha));
+    --inner-bg: rgba(18, 18, 21, var(--card-bg-alpha));
+    --input-bg: rgba(24, 24, 27, var(--card-bg-alpha));
+    --modal-bg: rgba(16, 16, 20, 0.92);
+    --modal-input-bg: rgba(255, 255, 255, 0.03);
+    --icon-bg: rgba(255, 255, 255, 0.04);
+    --shadow-color: rgba(0, 0, 0, 0.45);
+    --glass-blur: blur(12px);
+    --card-solid-bg: rgba(24, 24, 27, var(--card-bg-alpha));
+    --wallpaper-mask-opacity: 0.10;
+    --ui-mask-tint: rgba(0, 0, 0, 0.055); /* 搜索栏 / 二级目录随遮罩暗化，由 JS 覆盖 */
+    --sidebar-width: 280px;
+    --sidebar-bg: rgba(16, 16, 19, 0.85);
+    --sidebar-item-hover: rgba(255, 255, 255, 0.08);
+    --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+    --radius-card: 16px;
+    --radius-btn: 12px;
+
+    /* FAB / 侧栏触控尺寸（响应式覆盖）— 桌面默认（已缩小） */
+    --fab-toggle-size: 44px;
+    --fab-item-size: 40px;
+    --fab-icon-size: 20px;
+    --fab-plus-len: 16px;
+    --fab-plus-thick: 2.5px;
+    --fab-gap: 10px;
+    --fab-edge: 22px;
+    --sidebar-toggle-size: 44px;
+    --sidebar-row-min: 44px;
+    --sidebar-sub-row-min: 38px;
+    --sidebar-chevron-size: 28px;
+
+    /* 直显模式链接卡片统一高度 */
+    --card-height: 72px;
+}
+
+/* 降低绘制成本：系统偏好减少透明 / 慢刷新设备关闭毛玻璃 */
+@media (prefers-reduced-transparency: reduce), (update: slow) {
+    :root {
+        --glass-blur: none;
+        --card-glass-bg: var(--card-solid-bg);
+    }
+    html.light-mode {
+        --card-glass-bg: rgba(255, 255, 255, 0.98);
+    }
+}
+
+html.light-mode {
+    --bg-dark: #f8fafc;
+    --bg-gradient: radial-gradient(circle at 50% -15%, #e8eef6 0%, #f1f5f9 40%, #f8fafc 85%);
+    --text-main: #0f172a;
+    --text-sub: #64748b;
+    --border-normal: rgba(15, 23, 42, 0.08);
+    --card-bg-alpha: 0.60;
+    --card-glass-bg: rgba(255, 255, 255, var(--card-bg-alpha));
+    --inner-bg: rgba(241, 245, 249, var(--card-bg-alpha));
+    --input-bg: rgba(255, 255, 255, var(--card-bg-alpha));
+    --modal-bg: rgba(255, 255, 255, 0.97);
+    --modal-input-bg: rgba(15, 23, 42, 0.03);
+    --icon-bg: rgba(15, 23, 42, 0.04);
+    --shadow-color: rgba(15, 23, 42, 0.07);
+    --card-solid-bg: rgba(255, 255, 255, var(--card-bg-alpha));
+    --wallpaper-mask-opacity: 0.10;
+    --sidebar-bg: rgba(255, 255, 255, 0.92);
+    --sidebar-item-hover: rgba(15, 23, 42, 0.05);
+}
