@@ -1,1 +1,43 @@
+# GitHub Pages 部署（可选，替代「Settings → Pages → Deploy from a branch」）
+# 启用方式：仓库 Settings → Pages → Source 选 GitHub Actions
+#
+# 优点：部署日志清晰、可扩展构建步骤、与 PR 预览兼容（若后续需要）
 
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # 纯静态，根目录即站点
+          path: .
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
