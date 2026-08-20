@@ -656,8 +656,19 @@ html.light-mode .wallpaper-upload-btn:hover {
     background: rgba(59, 130, 246, 0.08);
 }
 
-/* body 壁纸状态：黑色遮罩暗化（深度由 --wallpaper-mask-opacity 控制，与「遮罩暗化」滑块联动） */
+/* body 壁纸状态：使用 fixed 伪元素承载壁纸 + 遮罩，避免：
+   1) background-attachment: fixed 在 iOS/移动端异常
+   2) 直显模式长页面下 background-size: cover 按 body 高度缩放导致壁纸被放大/错位（下滑出现大脸等问题）
+   深度由 --wallpaper-mask-opacity 控制，与「遮罩暗化」滑块联动 */
 body.has-wallpaper {
+    background: transparent;
+}
+body.has-wallpaper::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
     background-image:
         linear-gradient(
             rgba(0, 0, 0, var(--wallpaper-mask-opacity, 0.10)),
@@ -667,10 +678,9 @@ body.has-wallpaper {
     background-size: cover, cover;
     background-position: center, center;
     background-repeat: no-repeat, no-repeat;
-    background-attachment: fixed, fixed;
 }
 /* 浅色模式同样用黑色压暗，避免白蒙层把壁纸洗白 */
-html.light-mode body.has-wallpaper {
+html.light-mode body.has-wallpaper::before {
     background-image:
         linear-gradient(
             rgba(0, 0, 0, var(--wallpaper-mask-opacity, 0.10)),
@@ -680,17 +690,11 @@ html.light-mode body.has-wallpaper {
 }
 
 /* 按设备方向微调壁纸构图（竖屏偏上，横屏居中） */
-body.has-wallpaper[data-device-orient="portrait"] {
+body.has-wallpaper[data-device-orient="portrait"]::before {
     background-position: center, center top;
 }
-body.has-wallpaper[data-device-orient="landscape"] {
+body.has-wallpaper[data-device-orient="landscape"]::before {
     background-position: center, center;
-}
-@media (max-width: 1024px) {
-    body.has-wallpaper {
-        /* iOS 上 fixed 易异常，改用 scroll */
-        background-attachment: scroll, scroll;
-    }
 }
 
 
