@@ -1,5 +1,4 @@
-# 个人导航（WodeNav）
-
+# 个人导航（WodeNav）纯Ai制作
 纯前端个人导航页：分类链接、多搜索引擎、主题与壁纸、拖拽排序、多端同步。  
 数据默认保存在浏览器 `localStorage`，适合部署到 **GitHub Pages** / **Cloudflare Pages** / **Vercel** 等静态托管。
 
